@@ -59,6 +59,17 @@ services:
     restart: always
     logging: *default-logging
 
+  photon:
+    ports:
+        - 8080:3000
+    environment:
+        - PUBLIC_INSTANCE_URL={{ domain }}
+    image: ghcr.io/xyphyn/photon:latest
+    restart: always
+    logging: *default-logging
+    depends_on:
+      -proxy
+    
   pictrs:
     image: docker.io/asonix/pictrs:0.4.7
     # this needs to match the pictrs url in lemmy.hjson
