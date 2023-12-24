@@ -151,10 +151,20 @@
         dest: /etc/docker/daemon.json
         mode: "0644"
 
-    - name: Request initial letsencrypt certificate
-      ansible.builtin.command: certbot certonly --nginx --agree-tos --cert-name '{{ domain }}' -d '{{ domain }}' -m '{{ letsencrypt_contact_email }}'
-      args:
-        creates: "/etc/letsencrypt/live/{{ domain }}/privkey.pem"
+    #  # no-letsencrypt REMOVED #  #
+    # - name: Request initial letsencrypt certificate
+    #   ansible.builtin.command: certbot certonly --nginx --agree-tos --cert-name '{{ domain }}' -d '{{ domain }}' -m '{{ letsencrypt_contact_email }}'
+    #   args:
+    #     creates: "/etc/letsencrypt/live/{{ domain }}/privkey.pem"
+
+    #  # no-letsencrypt ADDED #  #
+    #  # Upload certificate as `fullchain.pem` and certificate key as `privkey.pem` #  # 
+    - name: Create domain certificate directory
+      ansible.builtin.file:
+        path: "/etc/letsencrypt/live/{{ domain }}"
+        state: directory
+        mode: "0755"
+        owner: "root"
 
     - name: Create lemmy folder
       ansible.builtin.file:
@@ -261,9 +271,10 @@
         pull: true
         remove_orphans: true
 
-    - name: Certbot renewal cronjob
-      ansible.builtin.cron:
-        special_time: daily
-        name: certbot-renew-lemmy
-        user: root
-        job: "certbot certonly --nginx --cert-name '{{ domain }}' -d '{{ domain }}' --deploy-hook 'nginx -s reload'"
+    #  # no-letsencrypt REMOVED #  #
+    # - name: Certbot renewal cronjob
+    #   ansible.builtin.cron:
+    #     special_time: daily
+    #     name: certbot-renew-lemmy
+    #     user: root
+    #     job: "certbot certonly --nginx --cert-name '{{ domain }}' -d '{{ domain }}' --deploy-hook 'nginx -s reload'"
