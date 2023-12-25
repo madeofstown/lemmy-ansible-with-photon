@@ -61,7 +61,7 @@ services:
 
   photon:
     ports:
-        - 8080:3000
+        - 8081:3000
     environment:
         - PUBLIC_INSTANCE_URL={{ domain }}
     image: ghcr.io/xyphyn/photon:latest
