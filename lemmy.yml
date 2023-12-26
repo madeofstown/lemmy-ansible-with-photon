@@ -86,7 +86,7 @@
         state: present
         update_cache: true
         pkg:
-          - "nginx"
+          # - "nginx"
           - "certbot"
           - "python3-certbot-nginx"
           - "apt-transport-https"
@@ -182,19 +182,19 @@
 
     - name: Deploy configuration files
       block:
-        - name: Generate random port for lemmy service
-          ansible.builtin.set_fact:
-            lemmy_port: "{{ 32767 | random(start=1024) }}"
-
-        - name: Distribute nginx proxy_params configuration
-          ansible.builtin.copy:
-            src: files/proxy_params
-            dest: "{{ lemmy_base_dir }}/{{ domain }}/proxy_params"
-            owner: root
-            group: root
-            mode: "0644"
-          notify: Reload nginx
-
+        #  # no-letsencrypt REMOVED #  #
+        # - name: Generate random port for lemmy service
+        #   ansible.builtin.set_fact:
+        #    lemmy_port: "{{ 32767 | random(start=1024) }}"
+        #
+        # - name: Distribute nginx proxy_params configuration
+        #   ansible.builtin.copy:
+        #     src: files/proxy_params
+        #     dest: "{{ lemmy_base_dir }}/{{ domain }}/proxy_params"
+        #     owner: root
+        #     group: root
+        #     mode: "0644"
+        #   notify: Reload nginx
         - name: Add template files
           ansible.builtin.template:
             src: "{{ item.src }}"
@@ -207,33 +207,35 @@
             - src: "templates/nginx_internal.conf"
               dest: "{{ lemmy_base_dir }}/{{ domain }}/nginx_internal.conf"
               mode: "0644"
-            - src: "templates/nginx.conf"
-              dest: "/etc/nginx/sites-available/{{ domain }}.conf"
-              mode: "0644"
+            #  # no-letsencrypt REMOVED #  #
+            # - src: "templates/nginx.conf"
+            #   dest: "/etc/nginx/sites-available/{{ domain }}.conf"
+            #   mode: "0644"
           notify: Reload nginx
           vars:
             lemmy_docker_image: "dessalines/lemmy:{{ lemmy_version | default(lookup('file', 'VERSION')) }}"
             lemmy_docker_ui_image: "dessalines/lemmy-ui:{{ lemmy_ui_version | default(lemmy_version | default(lookup('file', 'VERSION'))) }}"
 
-        - name: Set up nginx sites-enabled symlink
-          notify: Reload nginx
-          block:
-            - name: Gather stats on site enabled config
-              ansible.builtin.stat:
-                path: "/etc/nginx/sites-enabled/{{ domain }}.conf"
-              register: reg_enabled
-
-            - name: Remove if regular file (legacy) instead of symlink
-              ansible.builtin.file:
-                path: "/etc/nginx/sites-enabled/{{ domain }}.conf"
-                state: absent
-              when: reg_enabled.stat.exists and reg_enabled.stat.isreg
-
-            - name: Enable nginx site
-              ansible.builtin.file:
-                src: "../sites-available/{{ domain }}.conf"
-                dest: "/etc/nginx/sites-enabled/{{ domain }}.conf"
-                state: link
+        #  # no-letsencrypt REMOVED #  #
+        # - name: Set up nginx sites-enabled symlink
+        #   notify: Reload nginx
+        #   block:
+        #     - name: Gather stats on site enabled config
+        #       ansible.builtin.stat:
+        #         path: "/etc/nginx/sites-enabled/{{ domain }}.conf"
+        #       register: reg_enabled
+        #
+        #     - name: Remove if regular file (legacy) instead of symlink
+        #       ansible.builtin.file:
+        #        path: "/etc/nginx/sites-enabled/{{ domain }}.conf"
+        #         state: absent
+        #       when: reg_enabled.stat.exists and reg_enabled.stat.isreg
+        #
+        #     - name: Enable nginx site
+        #       ansible.builtin.file:
+        #         src: "../sites-available/{{ domain }}.conf"
+        #         dest: "/etc/nginx/sites-enabled/{{ domain }}.conf"
+        #         state: link
 
         - name: Add the config.hjson
           ansible.builtin.template:
