@@ -186,15 +186,15 @@
         # - name: Generate random port for lemmy service
         #   ansible.builtin.set_fact:
         #    lemmy_port: "{{ 32767 | random(start=1024) }}"
-        #
-        # - name: Distribute nginx proxy_params configuration
-        #   ansible.builtin.copy:
-        #     src: files/proxy_params
-        #     dest: "{{ lemmy_base_dir }}/{{ domain }}/proxy_params"
-        #     owner: root
-        #     group: root
-        #     mode: "0644"
-        #   notify: Reload nginx
+        
+        - name: Distribute nginx proxy_params configuration
+          ansible.builtin.copy:
+            src: files/proxy_params
+            dest: "{{ lemmy_base_dir }}/{{ domain }}/proxy_params"
+            owner: root
+            group: root
+            mode: "0644"
+          notify: Reload nginx
         - name: Add template files
           ansible.builtin.template:
             src: "{{ item.src }}"
