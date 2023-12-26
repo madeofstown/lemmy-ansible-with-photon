@@ -68,7 +68,7 @@ services:
     restart: always
     logging: *default-logging
     depends_on:
-      -proxy
+      - proxy
     
   pictrs:
     image: docker.io/asonix/pictrs:0.4.7
